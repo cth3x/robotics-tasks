@@ -38,15 +38,6 @@ int main()
 
         printf("%d, %d\n", lcliff, rcliff);
 
-        // if (lfcliff < 2700 && rfcliff > 2700)
-        // {
-        //     create_drive_direct(80, 50);
-        // }
-
-        // else
-        // {
-        //     create_drive_direct(50, 80);
-        // }
         msleep(500);
     }
 

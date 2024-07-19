@@ -27,15 +27,13 @@ int main()
         }
         else if (lfcliff > 2700 && rfcliff < 2700)
         {
-            // Reduced speed difference for a smoother left turn
             create_drive_direct(0, 150);
-            msleep(100); // Delay to allow the turn to complete
+            msleep(100);
         }
         else if (lfcliff < 2700 && rfcliff > 2700)
         {
-            // Reduced speed difference for a smoother right turn
             create_drive_direct(150, 0);
-            msleep(100); // Delay to allow the turn to complete
+            msleep(100);
         }
     }
 
