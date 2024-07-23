@@ -85,6 +85,7 @@ int main()
 
             create_drive_direct(100, 100);
             msleep(1300);
+
             create_drive_direct(0, 0);
             set_servo_position(1, 1200);
             msleep(2500);
