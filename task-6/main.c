@@ -1,6 +1,6 @@
 #include <kipr/wombat.h>
 
-int RED = 0, GREEN = 1, target = 80;
+int RED = 0, GREEN = 1, ORANGE = 2, target = 80;
 
 double Kp = 1, Ki = 0, Kd = 0;
 
@@ -33,6 +33,19 @@ int green_detected()
     return get_object_count(GREEN);
 }
 
+int orange_detected()
+{
+    camera_update();
+
+    return get_object_count(ORANGE);
+}
+
+point2 orange_center()
+{
+    camera_update();
+    return get_object_center(ORANGE, 0);
+}
+
 void pid_control(int error)
 {
     integral += error;
@@ -48,44 +61,75 @@ void pid_control(int error)
     create_drive_direct(left_speed, right_speed);
 }
 
+void raise()
+{
+    set_servo_position(0, 1000);
+    msleep(500);
+}
+
+void lower()
+{
+    set_servo_position(0, 0);
+    msleep(500);
+}
+
+void open()
+{
+    set_servo_position(1, 0);
+    msleep(500);
+}
+
+void close()
+{
+    set_servo_position(1, 600);
+    msleep(500);
+}
+
 int main()
 {
     create_connect();
-
+    enable_servos();
     camera_open();
+
+    raise();
+    open();
 
     create_drive_direct(50, -50);
     msleep(1000);
 
-    while (!red_detected())
+    while (!orange_detected())
     {
         camera_update();
     }
 
-    int red_x = get_object_center(RED, 0).x;
+    int orange_x = get_object_center(ORANGE, 0).x;
 
-    while (get_object_area(RED, 0) < 10000)
+    while (get_object_area(ORANGE, 0) < 10000)
     {
-        int error = target - red_x;
+        int error = target - orange_x;
         pid_control(error);
 
-        if (get_object_area(RED, 0) > 11000)
+        if (get_object_area(ORANGE, 0) > 11000)
         {
             create_drive_direct(0, 0);
+            lower();
+            close();
             break;
         }
 
         camera_update();
-        red_x = get_object_center(RED, 0).x;
+        orange_x = get_object_center(ORANGE, 0).x;
     }
 
-    create_drive_direct(0, 0);
-    msleep(1000);
+    raise();
 
-    previous_error = 0;
-    integral = 0;
+    while (!green_detected())
+    {
+        camera_update();
+    }
 
-    int green_x = get_object_center(GREEN, 0).x;
+    green_x = get_object_center(GREEN, 0).x;
+
     while (get_object_area(GREEN, 0) < 10000)
     {
         int error = target - green_x;
@@ -100,6 +144,9 @@ int main()
         camera_update();
         green_x = get_object_center(GREEN, 0).x;
     }
+
+    lower();
+    open();
 
     create_stop();
 
